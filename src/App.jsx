@@ -172,7 +172,7 @@ export default function App() {
       {/* ---------- NAV BAR ---------- */}
       <nav className="sticky top-0 z-20 backdrop-blur-md border-b border-black/10 px-6 py-3 flex justify-between items-center"
            style={{ backgroundColor: `${BONE}E6` }}>
-        <span className="text-lg tracking-wide" style={{ fontFamily: 'Fraunces, serif' }}>Threadsmith</span>
+        <span className="text-lg tracking-wide" style={{ fontFamily: 'Fraunces, serif' }}>Riche's Collection</span>
         <a
           href={`https://wa.me/${WHATSAPP_NUMBER}`}
           target="_blank"
@@ -188,18 +188,19 @@ export default function App() {
       {/* ---------- HERO ---------- */}
       <header className="px-6 pt-16 pb-14 text-center" style={{ backgroundColor: INK, color: BONE }}>
         <span className="text-[11px] uppercase tracking-[0.25em]" style={{ color: BRASS, fontFamily: 'IBM Plex Mono, monospace' }}>
-          Est. for the deliberately dressed
+          This is the home of a Gentle Man, Grab your fit
         </span>
 
         <h1 className="mt-6 text-5xl sm:text-6xl leading-tight" style={{ fontFamily: 'Fraunces, serif', fontWeight: 500 }}>
-          Cut once.
+          Riche's Collection.
           <br />
-          <em style={{ color: BRASS }}>Worn well.</em>
+          <em style={{ color: 'BRASS' }}>Worn well.</em>
         </h1>
 
         <p className="mt-6 max-w-lg mx-auto text-base font-light leading-relaxed" style={{ color: `${BONE}B3` }}>
           Long-sleeve and short-sleeve shirts, hand-finished from breathable
           premium cloth and tailored to sit right at the shoulder, cuff, and collar.
+          Here is a Home of quality 
         </p>
 
         <a
@@ -220,7 +221,7 @@ export default function App() {
               The Collection
             </span>
             <h2 className="mt-3 text-3xl sm:text-4xl" style={{ fontFamily: 'Fraunces, serif' }}>
-              Two cuts. Every occasion.
+              Look Smart. Every occasion.
             </h2>
             <StitchLine className="w-16 mx-auto mt-5" />
 
@@ -272,7 +273,7 @@ export default function App() {
 
       {/* ---------- FOOTER ---------- */}
       <footer className="py-8 px-6 text-center text-xs" style={{ backgroundColor: '#E7DFCE', color: `${INK}99` }}>
-        &copy; {new Date().getFullYear()} Threadsmith. All rights reserved.
+        &copy; {new Date().getFullYear()} Riche's Collection. All rights reserved.
       </footer>
     </div>
   )
