@@ -279,14 +279,59 @@ export default function App() {
   )
 }
 
-/* =========================================================================
+/*/* =========================================================================
    5. THE PRODUCT CARD — one card per shirt: image, price, colors, sizes,
       and the "Order via WhatsApp" button.
    ========================================================================= */
 function ProductCard({ product }) {
+  // 1. Convert colors string "Sky Blue/White/Navy Blue" -> [{ name: 'Sky Blue', cssValue: 'skyblue' }]
+// This handles standard HTML color names, spaces, and custom hex codes!
+const parsedColors = typeof product.colors === 'string' && product.colors.trim() !== ''
+  ? product.colors.split('/').map(c => {
+      const name = c.trim();
+      
+      // If it is a hex code (e.g., #27500A), the CSS value is the hex code itself.
+      // If it is a custom name with spaces (e.g., "Sky Blue"), we remove spaces for the CSS color value ("skyblue").
+      // If it's a completely custom text name (e.g., "Soft Sand") that CSS doesn't natively know, 
+      // we'll default to a clean neutral preview color, but keep the correct label name!
+      let cssValue = name;
+      if (!name.startsWith('#')) {
+        cssValue = name.toLowerCase().replace(/\s+/g, '');
+      }
+
+      return { name, cssValue };
+    })
+  : [];
+  // --- PARSING HELPERS ---
+  
+  // 1. Convert sizes string "S/M/L" -> ['S', 'M', 'L']
+  const parsedSizes = typeof product.sizes === 'string'
+    ? product.sizes.split('/').map(s => s.trim())
+    : Array.isArray(product.sizes) ? product.sizes : []
+
+  // 2. Convert colors string "Green/Yellow" -> [{ name: 'Green', hex: 'Green' }]
+  // Note: Supports hex codes too! If you type "#27500A/Navy", it maps them correctly.
+  const parsedColors = typeof product.colors === 'string'
+    ? product.colors.split('/').map(c => {
+        const name = c.trim()
+        // If it starts with #, use it as the hex code. Otherwise, use the name itself as the color.
+        return { name: name, hex: name.startsWith('#') ? name : name.toLowerCase() }
+      })
+    : Array.isArray(product.colors) ? product.colors : []
+
+  // --- STATE SETUP ---
   const [size, setSize] = useState('')
-  const [color, setColor] = useState(product.colors[0].name)
-  const outOfStock = product.inStock === false
+  // Fallback if parsedColors is empty to avoid reading undefined
+  const [color, setColor] = useState(parsedColors[0]?.name || '')
+  
+  // Sync state if color initial state changes
+  useEffect(() => {
+    if (parsedColors.length > 0 && !color) {
+      setColor(parsedColors[0].name)
+    }
+  }, [product.colors])
+
+  const outOfStock = product.inStock === false || product.in_stock === false
 
   const handleOrder = () => {
     if (!size || outOfStock) return
@@ -340,57 +385,79 @@ Please confirm and share payment details.`
               </p>
             </div>
             <p className="text-lg whitespace-nowrap pt-1" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-              GHS {product.price.toFixed(2)}
+              GHS {Number(product.price).toFixed(2)}
             </p>
           </div>
 
           <StitchLine className="my-4" />
 
-          {/* colors */}
-          <div className="mb-4">
-            <span className="text-[10px] uppercase tracking-widest text-black/45 block mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-              Cloth — {color}
-            </span>
-            <div className="flex gap-2">
-              {product.colors.map((c) => (
-                <button
-                  key={c.name}
-                  onClick={() => setColor(c.name)}
-                  title={c.name}
-                  className="w-9 h-9 rounded-sm border transition-transform"
-                  style={{
-                    backgroundColor: c.hex,
-                    borderColor: color === c.name ? INK : 'rgba(0,0,0,0.15)',
-                    transform: color === c.name ? 'scale(1.08)' : 'scale(1)',
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+        {/* colors */}
+{parsedColors.length > 0 && (
+  <div className="mb-4">
+    {/* This dynamically displays the currently selected color's exact name! */}
+    <span className="text-[10px] uppercase tracking-widest text-black/45 block mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+      Cloth — <span className="font-semibold text-black/80">{color || parsedColors[0].name}</span>
+    </span>
+    
+    <div className="flex gap-2.5 flex-wrap">
+      {parsedColors.map((c) => {
+        const isSelected = color === c.name;
+        return (
+          <button
+            key={c.name}
+            type="button"
+            onClick={() => setColor(c.name)}
+            title={c.name}
+            className="w-9 h-9 rounded-full border transition-all duration-150 relative flex items-center justify-center"
+            style={{
+              // Use the parsed CSS value (or hex) as the background color
+              backgroundColor: c.cssValue,
+              borderColor: isSelected ? INK : 'rgba(0,0,0,0.15)',
+              transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+              boxShadow: isSelected ? '0 0 0 2px rgba(0,0,0,0.1)' : 'none',
+            }}
+          >
+            {/* Subtle inner dot indicator to show selection clearly, especially on white/light colors */}
+            {isSelected && (
+              <span 
+                className="w-2.5 h-2.5 rounded-full" 
+                style={{ 
+                  backgroundColor: c.cssValue.toLowerCase() === 'white' || c.cssValue === '#ffffff' ? '#000' : '#fff' 
+                }} 
+              />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+)}
 
           {/* sizes */}
-          <div className="mb-5">
-            <span className="text-[10px] uppercase tracking-widest text-black/45 block mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
-              Size
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {product.sizes.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSize(s)}
-                  className="w-9 h-9 text-xs font-medium rounded-sm border flex items-center justify-center"
-                  style={{
-                    fontFamily: 'IBM Plex Mono, monospace',
-                    backgroundColor: size === s ? INK : 'transparent',
-                    borderColor: size === s ? INK : 'rgba(0,0,0,0.2)',
-                    color: size === s ? BONE : 'rgba(0,0,0,0.7)',
-                  }}
-                >
-                  {s}
-                </button>
-              ))}
+          {parsedSizes.length > 0 && (
+            <div className="mb-5">
+              <span className="text-[10px] uppercase tracking-widest text-black/45 block mb-2" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
+                Size
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {parsedSizes.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setSize(s)}
+                    className="w-9 h-9 text-xs font-medium rounded-sm border flex items-center justify-center"
+                    style={{
+                      fontFamily: 'IBM Plex Mono, monospace',
+                      backgroundColor: size === s ? INK : 'transparent',
+                      borderColor: size === s ? INK : 'rgba(0,0,0,0.2)',
+                      color: size === s ? BONE : 'rgba(0,0,0,0.7)',
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* order button */}
