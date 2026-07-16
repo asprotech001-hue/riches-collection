@@ -7,7 +7,7 @@ import { supabase, supabaseConfigured } from './supabaseClient'
    ========================================================================= */
 
 // The client's WhatsApp number, digits only, with country code (no + or spaces).
-const WHATSAPP_NUMBER = '233500000000'
+const WHATSAPP_NUMBER = '233555266377'
 
 // Used only if Supabase isn't set up yet, or can't be reached — so the site
 // never breaks. Once Supabase is connected, real products (added from
